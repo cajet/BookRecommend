@@ -35,13 +35,13 @@ def loadBook(filename):
 def loadBorrowTable(filename, pivot=0.7):
     sql_insert_borrow = "INSERT INTO BorrowTable (card_id, book_id, book_name, mark, testdata) VALUES ('%s', '%s', '%s', '%d', '%d');"
     for line in loadfile(filename):
-        user, bookid, rating, _= line.split('::')
+        user, bookid, rating= line.split('::')
         sql_query_bookname = "SELECT book_name FROM BookTable WHERE id = '%d';"
         if random.random() < pivot:  #训练数据
             try:
                 cursor.execute(sql_query_bookname % int(bookid))  #根据书id找书名
                 for row in cursor.fetchall():
-                    #print(row[0])
+                    print(row[0])
                     data = (user, bookid, row[0], int(rating), 0)
                     cursor.execute(sql_insert_borrow % data)
             except:
@@ -51,7 +51,7 @@ def loadBorrowTable(filename, pivot=0.7):
             try:
                 cursor.execute(sql_query_bookname % int(bookid))  #根据书id找书名
                 for row in cursor.fetchall():
-                    #print(row[0])
+                    print(row[0])
                     data = (user, bookid, row[0], int(rating), 1)
                     cursor.execute(sql_insert_borrow % data)
             except:
