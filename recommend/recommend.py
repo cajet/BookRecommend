@@ -8,12 +8,13 @@ from static import dataSet as ds
 
 class Recommend(object):
 
-    def __init__(self, user, k, recom_nums):
+    def __init__(self, user, k, recom_nums, algo_type):
         self.rank = {}
         self.borrowed_books = ds.trainset[user]
         self.K = k
         self.N = recom_nums
         self.user= user
+        self.algorithm_type= algo_type
     '''
     def recommend_by_itemcf(self): #从数据库BookSimilarity导入相似度数据
         db = pymysql.connect("localhost", "CAJET", "12226655", "book_recommend")
@@ -36,6 +37,11 @@ class Recommend(object):
         # return the topN movies
         return sorted(self.rank.items(), key=itemgetter(1), reverse=True)[:self.N]
     '''
+    def start_recommend(self):
+        if (self.algorithm_type == 0):
+            return self.recommend_by_itemcf()
+        if (self.algorithm_type == 1):
+            return self.recommend_by_usercf()
 
     def recommend_by_itemcf(self):
         if (len(its.book_similarity_matrix) == 0):   #避免重复计算相似度矩阵

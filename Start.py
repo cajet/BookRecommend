@@ -1,8 +1,11 @@
 import time
-
+import sys
 from recommend import recommend as rec
 from static import dataSet as ds
 from recommend import performance as pf
+from PyQt5.QtWidgets import QApplication , QMainWindow
+
+from view.MainPage import *
 
 if __name__ == '__main__':
 
@@ -18,6 +21,12 @@ if __name__ == '__main__':
     end3 = time.clock()
     print(end3 - start3)
     '''
+    app = QApplication(sys.argv)
+    mainWindow = QMainWindow()
+    ui = Ui_Dialog()
+    ui.setupUi(mainWindow)
+    mainWindow.show()
+    sys.exit(app.exec_())
 
 
 

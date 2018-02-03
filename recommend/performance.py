@@ -34,11 +34,10 @@ class Performance(object):
                 print ('recommended for %d users' % i, file=sys.stderr)
             test_books = ds.testset.get(user, {})
 
+            self.rec_books = rc.Recommend(user, self.K, self.N, self.algorithm_type).start_recommend()
             if (self.algorithm_type == 0):
-                self.rec_books = rc.Recommend(user, self.K, self.N).recommend_by_itemcf()
                 self.book_popularity= its.book_popularity
             if (self.algorithm_type == 1):
-                self.rec_books= rc.Recommend(user, self.K, self.N).recommend_by_usercf()
                 self.book_popularity= us.book_popularity
 
             for book, _ in self.rec_books:
