@@ -1,31 +1,29 @@
-import pymysql
 import math
-import os
 import sys
-from model import dataSet as ds
+
+import pymysql
+
+from static import dataSet as ds
 
 #计算并载入书籍相似度到BookSimilarity表，计算并载入书籍热门度到BookPopularity表
 
-book_similarity_matrix={}
+book_similarity_matrix ={}      #书籍相似度矩阵
+book_popularity = {}            #有借阅记录的书籍和对应的借阅人数（popularity）
 
 class ItemSimilarity(object):
-    
-    def __init__(self):
-        self.book_popularity = {}
-        self.book_count = 3085
-        
+
     def cal_book_similarity(self):
         for user, books in ds.trainset.items():
             for book in books:
                 # count item popularity，这里movie_popular[movie]即给物品movie打分的用户数
-                if book not in self.book_popularity:
-                    self.book_popularity[book] = 0
-                self.book_popularity[book] += 1
+                if book not in book_popularity:
+                    book_popularity[book] = 0
+                book_popularity[book] += 1
 
         print('count books number and popularity succ', file=sys.stderr)
 
         # save the total number of books
-        book_count = len(self.book_popularity)
+        book_count = len(book_popularity)
         print('total book number = %d' % book_count, file=sys.stderr)
 
         # count co-rated users between items
@@ -50,7 +48,7 @@ class ItemSimilarity(object):
             MAX_Wij= 0
             for m2, count in related_books.items():
                 itemsim_mat[m1][m2] = count / math.sqrt(
-                    self.book_popularity[m1] * self.book_popularity[m2])
+                    book_popularity[m1] * book_popularity[m2])
                 if itemsim_mat[m1][m2]> MAX_Wij:
                     MAX_Wij= itemsim_mat[m1][m2]
 
@@ -81,8 +79,8 @@ class ItemSimilarity(object):
         sql_insert_bookPor="INSERT INTO BookPopularity (book_id, self.book_popularity) VALUES ('%s', '%d');"
         db = pymysql.connect("localhost", "CAJET", "12226655", "book_recommend")
         cursor = db.cursor()
-        for book in self.book_popularity:
-            data= (book, self.book_popularity[book])
+        for book in book_popularity:
+            data= (book, book_popularity[book])
             try:
                 cursor.execute(sql_insert_bookPor % data)
             except:
@@ -91,3 +89,22 @@ class ItemSimilarity(object):
         db.close()
         print('load book popularity into BookPopularity Table succ',
               file=sys.stderr)
+
+    def getBookSimilarity(self, book1id, book2id):
+        if (len(book_similarity_matrix) != 0):
+            return book_similarity_matrix[book1id][book2id]
+        '''
+        else:
+            self.cal_book_similarity()
+            return book_similarity_matrix[book1id][book2id]
+        '''
+        db = pymysql.connect("localhost", "CAJET", "12226655", "book_recommend")
+        cursor = db.cursor()
+        sql_query_sim = "SELECT similarity FROM BookSimilarity WHERE book1_id= '%s' AND book2_id= '%s';"
+        data=(book1id, book2id)
+        try:
+            cursor.execute(sql_query_sim % data)
+        except:
+            print("KeyError!")
+        for row in cursor.fetchall():
+            return row[0]

@@ -1,20 +1,24 @@
-import sys
-import os
-import pymysql
 import time
-from model import dataSet as ds
+
+from recommend import recommend as rec
+from static import dataSet as ds
+from recommend import performance as pf
 
 if __name__ == '__main__':
-    start = time.clock()
-    db = pymysql.connect("localhost", "CAJET", "12226655", "book_recommend")
-    cursor = db.cursor()
-    sql_query_similarity="SELECT similarity FROM BookSimilarity WHERE book1_id='%s' AND book2_id='%s';"
-    try:
-        data=('3793','1')
-        cursor.execute(sql_query_similarity % data)
-    except:
-        print("Error!")
-    for row in cursor.fetchall():
-        print(row[0])
-    end = time.clock()
-    print(end - start)
+
+    ds.dataset()  # 执行里面的初始化给全局变量trainset,testset赋值
+    '''
+    start= time.clock()
+    rec.Recommend('14331000', 20, 10).recommend_by_itemcf()
+    end= time.clock()
+    print(end-start)
+    
+    start3 = time.clock()
+    pf.Performance(10, 20, 0).evaluate()
+    end3 = time.clock()
+    print(end3 - start3)
+    '''
+
+
+
+
